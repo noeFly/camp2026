@@ -1,0 +1,39 @@
+name: Bug report
+description: Report something broken on the site or in development.
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: 問題
+      placeholder: 例如：首頁活動牆在手機寬度下圖片重疊。
+    validations:
+      required: true
+
+  - type: input
+    id: location
+    attributes:
+      label: 相關頁面或區塊
+      placeholder: https://sitcon.camp/2026/about 或 src/pages/about/index.astro
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: 詳細資訊
+      description: 請提供重現步驟、預期結果、實際結果，或截圖 / log。
+      placeholder: |
+        1. 開啟 ...
+        2. 看到 ...
+        預期應該是 ...
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: 環境（選填）
+      placeholder: Chrome 124 on iPhone 15 或 Node.js 22.12.0 / pnpm 10

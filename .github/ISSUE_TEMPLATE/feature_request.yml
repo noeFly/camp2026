@@ -1,0 +1,27 @@
+name: Feature request
+description: Suggest a site improvement or new feature.
+title: "[Feature] "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: 需求
+      placeholder: 例如：新增歷年活動影片區塊的篩選功能。
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 建議做法
+      description: 簡短描述預期 UI、互動方式、資料來源，或相關頁面。
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: 補充說明（選填）
+      description: 可列出完成條件、參考資料、截圖，或需要注意的限制。
