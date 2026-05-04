@@ -538,6 +538,7 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 
 	.topic-card__title {
 		margin: 0;
+		padding-block: clamp(0.22rem, 0.7vw, 0.58rem);
 		color: var(--master-accent);
 		font-size: clamp(2.2rem, 4.4vw, 4.65rem);
 		font-weight: 800;
@@ -1023,7 +1024,7 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 	@media (max-width: 40rem) {
 		.master-class {
 			--master-controls-offset: 0.75rem;
-			--master-controls-reserved: calc(5.4rem + env(safe-area-inset-bottom, 0px));
+			--master-controls-reserved: calc(1rem + env(safe-area-inset-bottom, 0px));
 			padding-block: 0 clamp(3rem, 12vw, 5rem);
 		}
 
@@ -1034,6 +1035,7 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 			width: min(100%, calc(100vw - var(--site-content-gutter) * 2));
 			max-width: 100%;
 			margin-inline: 0;
+			gap: 0.65rem;
 		}
 
 		.master-carousel__track {
@@ -1067,7 +1069,7 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 		}
 
 		.master-carousel__slide--topics {
-			padding-block-end: var(--master-controls-reserved);
+			padding-block-end: 0.55rem;
 		}
 
 		.topic-card {
@@ -1100,6 +1102,7 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 		.topic-card__title {
 			font-size: clamp(1.35rem, 7.4vw, 2rem);
 			line-height: 0.98;
+			padding-block: 0.14rem 0.2rem;
 		}
 
 		.topic-card__instructor {
@@ -1122,13 +1125,8 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 			line-height: 1.22;
 		}
 
-		.master-carousel__slide--topics {
-			padding-block-end: calc(0.55rem + var(--carousel-control-clearance));
-		}
-
 		.course-slide__content {
 			padding: 1rem;
-			padding-block-end: calc(1rem + var(--carousel-control-clearance));
 		}
 
 		.course-slide__speaker--multiple .course-slide__speaker-list {
@@ -1164,8 +1162,14 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 		.master-carousel__tabs {
 			flex-wrap: nowrap;
 			max-width: calc(100vw - 2rem - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
+			gap: 0.14rem;
+			padding: 0.24rem;
 			overflow-x: auto;
 			scrollbar-width: none;
+		}
+
+		.master-carousel__tab-indicator {
+			inset-block: 0.24rem;
 		}
 
 		.master-carousel__tabs::-webkit-scrollbar {
@@ -1173,8 +1177,8 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 		}
 
 		.master-carousel__tab {
-			padding-inline: 0.72rem;
-			font-size: 0.86rem;
+			padding: 0.42rem 0.62rem;
+			font-size: 0.82rem;
 		}
 	}
 </style>
