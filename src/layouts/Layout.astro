@@ -52,7 +52,7 @@ const structuredData = [
 	{
 		"@context": "https://schema.org",
 		"@type": "WebSite",
-		name: pageDocument.siteName,
+		name: pageDocument.shortName,
 		url: homeURL.href,
 		description: pageDocument.description,
 		inLanguage: pageDocument.lang,
@@ -105,7 +105,7 @@ const structuredData = [
 		<!-- SEO: Open Graph -->
 		<meta property="og:type" content={seoData.ogType} />
 		<meta property="og:locale" content="zh_TW" />
-		<meta property="og:site_name" content={pageDocument.siteName} />
+		<meta property="og:site_name" content={pageDocument.shortName} />
 		<meta property="og:url" content={seoData.canonicalURL} />
 		<meta property="og:title" content={seoData.title} />
 		<meta property="og:description" content={seoData.description} />
