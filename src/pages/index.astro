@@ -12,9 +12,29 @@ import OrganizersBrands from "@/components/OrganizerBrands.astro";
 import homeData from "@/data/home.json";
 
 const { pageMeta } = homeData;
+
+const stripMarkdown = (text: string) => text.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
+
+const faqSchema = {
+	"@context": "https://schema.org",
+	"@type": "FAQPage",
+	mainEntity: homeData.faq.items.map(item => ({
+		"@type": "Question",
+		name: item.question,
+		acceptedAnswer: {
+			"@type": "Answer",
+			text: stripMarkdown(item.answer)
+		}
+	}))
+};
 ---
 
-<Layout title={pageMeta.title} description={pageMeta.description} ogImageAlt={pageMeta.ogImageAlt}>
+<Layout
+	title={pageMeta.title}
+	description={pageMeta.description}
+	ogImageAlt={pageMeta.ogImageAlt}
+	additionalStructuredData={faqSchema}
+>
 	<Hero />
 	<BrandMarquee />
 	<MasterClass />

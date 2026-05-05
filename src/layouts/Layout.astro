@@ -12,9 +12,10 @@ interface Props {
 	ogImageAlt?: string;
 	type?: "website" | "article";
 	noindex?: boolean;
+	additionalStructuredData?: object | object[];
 }
 
-const { title, description, ogImage, ogImageAlt, type = "website", noindex = false } = Astro.props;
+const { title, description, ogImage, ogImageAlt, type = "website", noindex = false, additionalStructuredData } = Astro.props;
 const { document: pageDocument } = layoutData;
 
 const siteURL = Astro.site ?? new URL("https://sitcon.camp");
@@ -126,7 +127,8 @@ const structuredData = [
 		<meta name="twitter:image:alt" content={seoData.ogImageAlt} />
 
 		<!-- JSON-LD: Event / Site / Organization -->
-		<script type="application/ld+json" set:html={JSON.stringify(structuredData)} is:inline />
+		{!noindex && <script type="application/ld+json" set:html={JSON.stringify(structuredData)} is:inline />}
+		{!noindex && additionalStructuredData && <script type="application/ld+json" set:html={JSON.stringify(additionalStructuredData)} is:inline />}
 	</head>
 	<body>
 		<!-- Google Tag Manager (noscript) -->
