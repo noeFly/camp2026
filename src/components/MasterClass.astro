@@ -130,17 +130,32 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 									<figure class:list={["course-slide__media", { "course-slide__media--duo": masterClass.speakers.length > 1 }]}>
 										{masterClass.speakers.map(speaker => {
 											const image = getMasterImage(speaker);
+											const isCustomSizedPortrait = speaker.imageKey === "ak-kuo";
+											const courseImagePosition = isCustomSizedPortrait ? "center center" : speaker.imagePosition;
+											const courseImageClass = isCustomSizedPortrait ? "course-slide__image course-slide__image--custom-size" : "course-slide__image";
 
 											return (
-												<div class="course-slide__portrait">
+												<div class:list={["course-slide__portrait", { "course-slide__portrait--custom-size": isCustomSizedPortrait }]}>
+													{isCustomSizedPortrait && (
+														<Image
+															src={image}
+															alt=""
+															aria-hidden="true"
+															class="course-slide__image course-slide__image--backdrop"
+															loading="lazy"
+															decoding="async"
+															format="webp"
+															style={`object-position: ${courseImagePosition}`}
+														/>
+													)}
 													<Image
 														src={image}
 														alt={`${masterClass.title} ${speaker.instructor} 講師照片`}
-														class="course-slide__image"
+														class={courseImageClass}
 														loading="lazy"
 														decoding="async"
 														format="webp"
-														style={`object-position: ${speaker.imagePosition}`}
+														style={`object-position: ${courseImagePosition}`}
 													/>
 												</div>
 											);
@@ -728,6 +743,10 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 		overflow: hidden;
 	}
 
+	.course-slide__portrait--custom-size {
+		background: color-mix(in srgb, var(--master-accent) 8%, var(--color-background));
+	}
+
 	.course-slide__media--duo .course-slide__portrait + .course-slide__portrait {
 		border-block-start: 0.18rem solid var(--color-foreground);
 	}
@@ -741,6 +760,22 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 		object-fit: cover;
 		filter: saturate(0.95) contrast(1.04);
 		transform: scale(1.04);
+	}
+
+	.course-slide__portrait--custom-size .course-slide__image--backdrop {
+		object-fit: cover;
+		opacity: 0.34;
+		filter: blur(1rem) saturate(0.95) contrast(1.04);
+		transform: scale(1.14);
+	}
+
+	.course-slide__portrait--custom-size .course-slide__image--custom-size {
+		inset: 50% auto auto 50%;
+		width: auto;
+		max-width: none;
+		height: 106%;
+		object-fit: contain;
+		transform: translate3d(-50%, -50%, 0);
 	}
 
 	.course-slide__content {
