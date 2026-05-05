@@ -1,7 +1,7 @@
 ---
 import type { ImageMetadata } from "astro";
 import { Image } from "astro:assets";
-import MaterialSymbolsPlayCircleOutlineRounded from "~icons/material-symbols/play-circle-outline-rounded";
+import IcRoundPlayCircle from "~icons/ic/round-play-circle";
 import MarkdownIt from "markdown-it";
 
 import homeData from "@/data/home.json";
@@ -114,7 +114,7 @@ const videos = studentComment.video.map(video => {
 								<Image src={v.cover} alt="" class="absolute inset-0 h-full w-full object-cover" loading="lazy" decoding="async" />
 
 								<div class="from-foreground relative z-10 flex h-full w-full items-center justify-center rounded-4xl bg-linear-to-t from-0% to-transparent to-30%">
-									<MaterialSymbolsPlayCircleOutlineRounded class="text-background text-2xl" />
+									<IcRoundPlayCircle class="text-background bg-foreground/50 rounded-full text-5xl" />
 								</div>
 
 								<p class="text-background absolute bottom-3 left-0 z-10 w-full text-center text-3xl font-bold">{v.label}</p>
@@ -232,76 +232,52 @@ const videos = studentComment.video.map(video => {
 
 <script>
 	const dialog = document.getElementById("comment-dialog") as HTMLDialogElement | null;
-
 	const iframe = document.getElementById("comment-iframe") as HTMLIFrameElement | null;
 
 	const studentCommentDialog = document.getElementById("student-comment-dialog") as HTMLDialogElement | null;
-
 	const studentCommentDialogHeader = document.getElementById("student-comment-dialog-header") as HTMLDivElement | null;
-
 	const studentCommentDialogName = document.getElementById("student-comment-dialog-name") as HTMLHeadingElement | null;
-
 	const studentCommentDialogAvatar = document.getElementById("student-comment-dialog-avatar") as HTMLImageElement | null;
-
 	const studentCommentDialogText = document.getElementById("student-comment-dialog-text") as HTMLDivElement | null;
-
 	const bgMarquee = document.querySelector("[data-student-bg-marquee]") as HTMLDivElement | null;
 
 	const videoMarqueeTrack = document.querySelector("[data-video-marquee-track]") as HTMLDivElement | null;
-
 	const videoMarqueeContainer = document.querySelector("[data-video-marquee-container]") as HTMLDivElement | null;
 
 	function renderBgMarqueeRows() {
 		if (!bgMarquee) return;
 
 		const text = bgMarquee.dataset.marqueeText ?? "";
-
 		const targetRowGap = window.innerWidth < 640 ? 96 : window.innerWidth < 1024 ? 128 : 160;
-
 		const rowCount = Math.min(24, Math.max(6, Math.ceil(bgMarquee.clientHeight / targetRowGap)));
-
 		const minimumTextRepeat = Math.max(20, Math.ceil((window.innerWidth * 2.5) / Math.max(text.length * 24, 1)));
-
 		const textRepeat = minimumTextRepeat + (minimumTextRepeat % 2);
-
 		const renderKey = `${rowCount}:${textRepeat}`;
 
 		if (bgMarquee.dataset.renderKey === renderKey) return;
 
 		bgMarquee.dataset.renderKey = renderKey;
-
 		bgMarquee.replaceChildren();
 
 		for (let i = 0; i < rowCount; i += 1) {
 			const row = document.createElement("div");
-
 			row.className = "student-comment-marquee-row";
-
 			row.style.marginLeft = `${(i % 3) * -8}rem`;
-
 			const rowText = document.createElement("span");
-
 			rowText.className = "student-comment-marquee-text";
-
 			rowText.textContent = `${text.repeat(textRepeat)}\u00A0`;
-
 			row.append(rowText);
-
 			bgMarquee.append(row);
 		}
 	}
 
 	if (bgMarquee) {
 		renderBgMarqueeRows();
-
 		const observer = new ResizeObserver(renderBgMarqueeRows);
-
 		observer.observe(bgMarquee);
-
 		window.addEventListener("beforeunload", () => {
 			observer.disconnect();
 		});
-
 		window.addEventListener("resize", renderBgMarqueeRows);
 	}
 
@@ -313,11 +289,15 @@ const videos = studentComment.video.map(video => {
 		function fillVideoMarquee() {
 			if (!sourceItems.length) return;
 
+			// 從第一個實際卡片量真實寬度，避免硬編碼在不同螢幕尺寸下誤算數量
+			// 卡片寬度為 min(82vw, 28rem)，加上 gap-4（16px）作為間距
+			const firstItem = groups[0]?.children[0] as HTMLElement | undefined;
+			const cardWidth = firstItem ? firstItem.getBoundingClientRect().width + 16 : 464; // fallback：28rem + 16px gap
+
 			const targetWidth = window.innerWidth * 1.25;
 
-			const estimatedCardWidth = 480;
-
-			const needCount = Math.max(sourceItems.length, Math.ceil(targetWidth / estimatedCardWidth));
+			const minCount = Math.max(sourceItems.length, Math.ceil(targetWidth / cardWidth));
+			const needCount = Math.ceil(minCount / sourceItems.length) * sourceItems.length;
 
 			for (const group of groups) {
 				group.replaceChildren();
@@ -330,7 +310,12 @@ const videos = studentComment.video.map(video => {
 
 		fillVideoMarquee();
 
-		window.addEventListener("resize", fillVideoMarquee);
+		let resizeTimer: ReturnType<typeof setTimeout>;
+
+		window.addEventListener("resize", () => {
+			clearTimeout(resizeTimer);
+			resizeTimer = setTimeout(fillVideoMarquee, 100);
+		});
 	}
 
 	videoMarqueeContainer?.addEventListener("click", e => {
