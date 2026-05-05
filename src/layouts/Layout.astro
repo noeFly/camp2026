@@ -22,7 +22,7 @@ const canonicalURL = new URL(Astro.url.pathname, siteURL);
 const homeURL = new URL("/2026/", siteURL);
 
 const seoData = {
-	title: title ?? pageDocument.siteName,
+	title: title ?? pageDocument.defaultTitle,
 	description: description ?? pageDocument.description,
 	canonicalURL: canonicalURL.href,
 	ogImage: new URL(ogImage ?? "/2026/og.jpg", siteURL).href,
@@ -53,7 +53,7 @@ const structuredData = [
 	{
 		"@context": "https://schema.org",
 		"@type": "WebSite",
-		name: pageDocument.shortName,
+		name: pageDocument.brandName,
 		url: homeURL.href,
 		description: pageDocument.description,
 		inLanguage: pageDocument.lang,
@@ -106,7 +106,7 @@ const structuredData = [
 		<!-- SEO: Open Graph -->
 		<meta property="og:type" content={seoData.ogType} />
 		<meta property="og:locale" content="zh_TW" />
-		<meta property="og:site_name" content={pageDocument.shortName} />
+		<meta property="og:site_name" content={pageDocument.brandName} />
 		<meta property="og:url" content={seoData.canonicalURL} />
 		<meta property="og:title" content={seoData.title} />
 		<meta property="og:description" content={seoData.description} />

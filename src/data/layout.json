@@ -2,8 +2,8 @@
 	"document": {
 		"lang": "zh-Hant-TW",
 		"gtmId": "GTM-NKHHNVV",
-		"siteName": "SITCON 夏令營 2026｜五天四夜資訊營隊",
-		"shortName": "SITCON 夏令營 2026",
+		"defaultTitle": "SITCON 夏令營 2026｜五天四夜資訊營隊",
+		"brandName": "SITCON 夏令營 2026",
 		"description": "透過課程與實作帶領對資訊有熱忱的學生探索軟體工程、AI 與資訊安全",
 		"ogImageAlt": "SITCON Camp 2026 活動主視覺，標示 7/8 至 7/12 於陽明交通大學舉辦，搭配歷屆講師授課與學員上課現場照片"
 	},
