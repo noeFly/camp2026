@@ -35,24 +35,31 @@ const items = timelineData.items.map(item => ({
   "
 >
 	<div class="relative z-20 flex justify-center md:justify-end">
-		<div class="group relative inline-block focus-within:[&_.calendar-menu]:visible focus-within:[&_.calendar-menu]:opacity-100 hover:[&_.calendar-menu]:visible hover:[&_.calendar-menu]:opacity-100">
+		<div
+			class="group relative inline-block md:focus-within:[&_.calendar-menu]:visible md:focus-within:[&_.calendar-menu]:opacity-100 md:hover:[&_.calendar-menu]:visible md:hover:[&_.calendar-menu]:opacity-100 [&.is-open_.calendar-menu]:visible [&.is-open_.calendar-menu]:opacity-100"
+			data-calendar-dropdown
+		>
 			<button
 				type="button"
 				class="bg-background text-foreground hover:bg-green focus-visible:outline-background flex h-12 items-center gap-2 rounded-2xl px-4 text-lg leading-none font-extrabold shadow-[0.25rem_0.25rem_0_0_var(--color-orange)] transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 sm:h-14 sm:px-5 sm:text-xl"
 				aria-label="將 SITCON Camp 2026 重要時程加入行事曆"
 				aria-haspopup="true"
+				aria-expanded="false"
+				aria-controls="registration-calendar-menu"
+				data-calendar-trigger
 			>
 				<CalendarPlusIcon class="size-5 sm:size-6" aria-hidden="true" />
 				<span>加入行事曆</span>
-				<ChevronDownIcon class="size-5 transition-transform group-focus-within:rotate-180 group-hover:rotate-180" aria-hidden="true" />
+				<ChevronDownIcon class="calendar-chevron size-5 transition-transform group-[.is-open]:rotate-180 md:group-focus-within:rotate-180 md:group-hover:rotate-180" aria-hidden="true" />
 			</button>
-			<div class="calendar-menu invisible absolute right-1/2 z-30 min-w-60 translate-x-1/2 pt-3 opacity-0 transition-opacity md:right-0 md:translate-x-0">
+			<div id="registration-calendar-menu" class="calendar-menu invisible absolute right-1/2 z-30 min-w-60 translate-x-1/2 pt-3 opacity-0 transition-opacity md:right-0 md:translate-x-0">
 				<div class="overflow-hidden rounded-2xl border-2 border-white/20 bg-white text-black shadow-xl">
 					<a
 						href={googleCalendarUrl}
 						target="_blank"
 						rel="noopener noreferrer"
 						class="flex items-center gap-3 px-4 py-3 text-base font-bold transition-colors hover:bg-black/5 focus-visible:bg-black/5 focus-visible:outline-none"
+						data-calendar-option
 					>
 						<CalendarPlusIcon class="text-soft-blue size-5 shrink-0" aria-hidden="true" />
 						<span>Google Calendar</span>
@@ -61,6 +68,7 @@ const items = timelineData.items.map(item => ({
 						href={calendarUrl}
 						download
 						class="flex items-center gap-3 border-t border-black/10 px-4 py-3 text-base font-bold transition-colors hover:bg-black/5 focus-visible:bg-black/5 focus-visible:outline-none"
+						data-calendar-option
 					>
 						<DownloadIcon class="text-soft-blue size-5 shrink-0" aria-hidden="true" />
 						<span>Apple Calendar</span>
@@ -69,6 +77,7 @@ const items = timelineData.items.map(item => ({
 						href={calendarUrl}
 						download
 						class="flex items-center gap-3 border-t border-black/10 px-4 py-3 text-base font-bold transition-colors hover:bg-black/5 focus-visible:bg-black/5 focus-visible:outline-none"
+						data-calendar-option
 					>
 						<DownloadIcon class="text-soft-blue size-5 shrink-0" aria-hidden="true" />
 						<span>iCal</span>
@@ -133,3 +142,55 @@ const items = timelineData.items.map(item => ({
 		</div>
 	</div>
 </div>
+
+<script>
+	const calendarDropdowns = document.querySelectorAll<HTMLElement>("[data-calendar-dropdown]");
+	const mobileCalendarQuery = window.matchMedia("(max-width: 767px)");
+
+	function setCalendarDropdownOpen(dropdown: HTMLElement, isOpen: boolean) {
+		dropdown.classList.toggle("is-open", isOpen);
+		dropdown.querySelector<HTMLButtonElement>("[data-calendar-trigger]")?.setAttribute("aria-expanded", String(isOpen));
+	}
+
+	for (const dropdown of calendarDropdowns) {
+		const trigger = dropdown.querySelector<HTMLButtonElement>("[data-calendar-trigger]");
+		const options = dropdown.querySelectorAll<HTMLAnchorElement>("[data-calendar-option]");
+
+		trigger?.addEventListener("click", event => {
+			if (!mobileCalendarQuery.matches) return;
+
+			event.stopPropagation();
+			setCalendarDropdownOpen(dropdown, !dropdown.classList.contains("is-open"));
+		});
+
+		for (const option of options) {
+			option.addEventListener("click", () => {
+				setCalendarDropdownOpen(dropdown, false);
+			});
+		}
+	}
+
+	document.addEventListener("click", event => {
+		if (!mobileCalendarQuery.matches) return;
+
+		for (const dropdown of calendarDropdowns) {
+			if (!dropdown.contains(event.target as Node)) {
+				setCalendarDropdownOpen(dropdown, false);
+			}
+		}
+	});
+
+	document.addEventListener("keydown", event => {
+		if (event.key !== "Escape") return;
+
+		for (const dropdown of calendarDropdowns) {
+			setCalendarDropdownOpen(dropdown, false);
+		}
+	});
+
+	mobileCalendarQuery.addEventListener("change", () => {
+		for (const dropdown of calendarDropdowns) {
+			setCalendarDropdownOpen(dropdown, false);
+		}
+	});
+</script>
