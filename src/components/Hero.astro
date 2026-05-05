@@ -40,10 +40,12 @@ const heroPhotoWallColumns = hero.photoWallColumns;
 		}
 	</div>
 	<div class="hero-page__content">
-		<p class="hero-page__subtitle" data-hero-page-subtitle>{hero.subtitle}</p>
-		<h1 id="hero-page-title" class="hero-page__title" data-hero-page-title>
-			<span data-hero-page-title-label>{hero.title}</span>
-		</h1>
+		<div class="hero-page__headline">
+			<p class="hero-page__subtitle" data-hero-page-subtitle>{hero.subtitle}</p>
+			<h1 id="hero-page-title" class="hero-page__title" data-hero-page-title>
+				<span data-hero-page-title-label>{hero.title}</span>
+			</h1>
+		</div>
 	</div>
 </section>
 
@@ -500,6 +502,12 @@ const heroPhotoWallColumns = hero.photoWallColumns;
 		padding: clamp(0.95rem, 1.8vw, 1.55rem) clamp(1rem, 3vw, 3rem) clamp(1.05rem, 2vw, 1.7rem);
 		width: 100%;
 		background: var(--color-background);
+	}
+
+	.hero-page__headline {
+		display: grid;
+		min-width: 0;
+		gap: clamp(0.35rem, 1.2vw, 0.9rem);
 	}
 
 	.hero-page__subtitle {
