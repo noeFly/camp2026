@@ -99,11 +99,17 @@ const videos = studentComment.video.map(video => {
 		</div>
 	</div>
 
-	<div class="marquee-container mb-16 flex w-screen overflow-hidden" data-video-marquee-container>
+	<div
+		class="video-marquee-viewport mb-16 flex w-screen overflow-x-auto overflow-y-hidden overscroll-x-contain focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-current"
+		data-video-marquee-container
+		role="region"
+		aria-label="歷年回顧影片"
+		tabindex="0"
+	>
 		<div class="marquee-track flex w-max" data-video-marquee-track>
 			{
-				[0, 1].map(groupIndex => (
-					<div class="marquee-group flex shrink-0 gap-4 pr-4" data-marquee-group aria-hidden={groupIndex === 1 ? "true" : undefined}>
+				[0, 1, 2].map(groupIndex => (
+					<div class="marquee-group flex shrink-0 gap-4 pr-4" data-marquee-group aria-hidden={groupIndex > 0 ? "true" : undefined}>
 						{videos.map(v => (
 							<button
 								type="button"
@@ -167,11 +173,16 @@ const videos = studentComment.video.map(video => {
 	}
 
 	.marquee-track {
-		animation: marquee 30s linear infinite;
+		will-change: scroll-position;
 	}
 
-	.marquee-container:hover .marquee-track {
-		animation-play-state: paused;
+	.video-marquee-viewport {
+		scrollbar-width: none;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	.video-marquee-viewport::-webkit-scrollbar {
+		display: none;
 	}
 
 	:global(.student-comment-marquee-row) {
@@ -234,7 +245,15 @@ const videos = studentComment.video.map(video => {
 	document.addEventListener("astro:page-load", () => {
 		const ac = new AbortController();
 		const { signal } = ac;
-		document.addEventListener("astro:before-swap", () => ac.abort(), { once: true });
+		let videoMarqueeRafId = 0;
+		document.addEventListener(
+			"astro:before-swap",
+			() => {
+				ac.abort();
+				cancelAnimationFrame(videoMarqueeRafId);
+			},
+			{ once: true }
+		);
 
 		const dialog = document.getElementById("comment-dialog") as HTMLDialogElement | null;
 		const iframe = document.getElementById("comment-iframe") as HTMLIFrameElement | null;
@@ -284,10 +303,35 @@ const videos = studentComment.video.map(video => {
 			window.addEventListener("resize", renderBgMarqueeRows, { signal });
 		}
 
-		if (videoMarqueeTrack) {
+		if (videoMarqueeContainer && videoMarqueeTrack) {
+			const viewport = videoMarqueeContainer;
 			const groups = Array.from(videoMarqueeTrack.querySelectorAll("[data-marquee-group]"));
 
 			const sourceItems = groups[0] ? Array.from(groups[0].children).map(item => item.cloneNode(true)) : [];
+			const marqueeDuration = 30_000;
+			let groupWidth = 0;
+			let isFocused = false;
+			let isHovered = false;
+			let isPointerDown = false;
+			let lastFrameTime = 0;
+			let didSetInitialScroll = false;
+
+			function shouldPauseVideoMarquee() {
+				return isFocused || isHovered || isPointerDown;
+			}
+
+			function normalizeVideoScroll() {
+				if (!groupWidth) return;
+
+				const lowerBound = groupWidth * 0.5;
+				const upperBound = groupWidth * 1.5;
+
+				if (viewport.scrollLeft < lowerBound) {
+					viewport.scrollLeft += groupWidth;
+				} else if (viewport.scrollLeft >= upperBound) {
+					viewport.scrollLeft -= groupWidth;
+				}
+			}
 
 			function fillVideoMarquee() {
 				if (!sourceItems.length) return;
@@ -309,6 +353,30 @@ const videos = studentComment.video.map(video => {
 						group.append(sourceItems[i % sourceItems.length].cloneNode(true));
 					}
 				}
+
+				groupWidth = groups[0]?.scrollWidth ?? 0;
+				if (!didSetInitialScroll && groupWidth) {
+					viewport.scrollLeft = groupWidth;
+					didSetInitialScroll = true;
+				} else {
+					normalizeVideoScroll();
+				}
+			}
+
+			function animateVideoMarquee(timestamp: number) {
+				if (!lastFrameTime) {
+					lastFrameTime = timestamp;
+				}
+
+				const elapsed = timestamp - lastFrameTime;
+				lastFrameTime = timestamp;
+
+				if (!shouldPauseVideoMarquee() && groupWidth) {
+					viewport.scrollLeft += (groupWidth / marqueeDuration) * elapsed;
+					normalizeVideoScroll();
+				}
+
+				videoMarqueeRafId = requestAnimationFrame(animateVideoMarquee);
 			}
 
 			fillVideoMarquee();
@@ -323,6 +391,61 @@ const videos = studentComment.video.map(video => {
 				},
 				{ signal }
 			);
+			viewport.addEventListener("scroll", normalizeVideoScroll, { passive: true, signal });
+			viewport.addEventListener(
+				"pointerenter",
+				() => {
+					isHovered = true;
+				},
+				{ signal }
+			);
+			viewport.addEventListener(
+				"pointerleave",
+				() => {
+					isHovered = false;
+					isPointerDown = false;
+					lastFrameTime = 0;
+				},
+				{ signal }
+			);
+			viewport.addEventListener(
+				"pointerdown",
+				() => {
+					isPointerDown = true;
+				},
+				{ signal }
+			);
+			window.addEventListener(
+				"pointerup",
+				() => {
+					isPointerDown = false;
+					lastFrameTime = 0;
+				},
+				{ signal }
+			);
+			viewport.addEventListener(
+				"focusin",
+				() => {
+					isFocused = true;
+				},
+				{ signal }
+			);
+			viewport.addEventListener(
+				"focusout",
+				() => {
+					isFocused = false;
+					lastFrameTime = 0;
+				},
+				{ signal }
+			);
+			document.addEventListener(
+				"visibilitychange",
+				() => {
+					lastFrameTime = 0;
+				},
+				{ signal }
+			);
+			videoMarqueeRafId = requestAnimationFrame(animateVideoMarquee);
 		}
 
 		videoMarqueeContainer?.addEventListener("click", e => {
