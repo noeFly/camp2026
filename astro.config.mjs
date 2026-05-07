@@ -10,31 +10,20 @@ import favicons from "astro-favicons";
 
 const base = "/2026";
 const basePath = base.replace(/^\/+|\/+$/g, "");
-const pwaAssetNames = new Set([
-	"android-chrome-192x192.png",
-	"android-chrome-512x512.png",
+const faviconAssetNames = new Set([
 	"apple-touch-icon-precomposed.png",
 	"apple-touch-icon.png",
-	"browserconfig.xml",
 	"favicon-16x16.png",
 	"favicon-32x32.png",
 	"favicon-48x48.png",
 	"favicon.ico",
 	"favicon.svg",
-	"manifest.webmanifest",
-	"mstile-144x144.png",
-	"mstile-150x150.png",
-	"mstile-310x150.png",
-	"mstile-310x310.png",
-	"mstile-70x70.png",
-	"safari-pinned-tab.svg",
-	"yandex-browser-50x50.png",
-	"yandex-browser-manifest.json"
+	"safari-pinned-tab.svg"
 ]);
 
-function emitPwaAssetsAtArtifactRoot() {
+function emitFaviconAssetsAtArtifactRoot() {
 	return {
-		name: "camp:pwa-assets-at-artifact-root",
+		name: "camp:favicon-assets-at-artifact-root",
 		enforce: /** @type {"post"} */ ("post"),
 		/**
 		 * @param {unknown} _
@@ -42,14 +31,14 @@ function emitPwaAssetsAtArtifactRoot() {
 		 */
 		generateBundle(_, bundle) {
 			for (const [fileName, asset] of Object.entries(bundle)) {
-				const pwaAssetName = fileName.startsWith(`${basePath}/`) ? fileName.slice(basePath.length + 1) : "";
+				const faviconAssetName = fileName.startsWith(`${basePath}/`) ? fileName.slice(basePath.length + 1) : "";
 
-				if (!pwaAssetNames.has(pwaAssetName)) {
+				if (!faviconAssetNames.has(faviconAssetName)) {
 					continue;
 				}
 
-				asset.fileName = pwaAssetName;
-				bundle[pwaAssetName] = asset;
+				asset.fileName = faviconAssetName;
+				bundle[faviconAssetName] = asset;
 				delete bundle[fileName];
 			}
 		}
@@ -127,7 +116,7 @@ export default defineConfig({
 			Icons({
 				compiler: "astro"
 			}),
-			emitPwaAssetsAtArtifactRoot()
+			emitFaviconAssetsAtArtifactRoot()
 		]
 	},
 
@@ -136,16 +125,18 @@ export default defineConfig({
 		favicons({
 			name: "SITCON Camp 2026",
 			short_name: "SITCON Camp",
-			manifest: {
-				start_url: `${base}/`,
-				display: "standalone",
-				orientation: "any",
-				display_override: ["window-controls-overlay", "minimal-ui"]
+			icons: {
+				android: false,
+				appleIcon: ["apple-touch-icon.png", "apple-touch-icon-precomposed.png", "safari-pinned-tab.svg"],
+				appleStartup: false,
+				favicons: true,
+				windows: false,
+				yandex: false
 			},
 			output: {
 				images: true,
-				files: true,
-				html: true,
+				files: false,
+				html: false,
 				assetsPrefix: base
 			}
 		})
