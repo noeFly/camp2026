@@ -50,7 +50,17 @@ const heroPhotoWallColumns = hero.photoWallColumns;
 </section>
 
 <script is:inline>
-	if (window.location.hash.length > 1) {
+	const heroIntroStorageKey = "camp2026:hero-intro-played";
+
+	const hasHeroIntroPlayed = () => {
+		try {
+			return window.localStorage.getItem(heroIntroStorageKey) === "1";
+		} catch {
+			return false;
+		}
+	};
+
+	if (window.location.hash.length > 1 || hasHeroIntroPlayed()) {
 		document.documentElement.classList.add("hero-intro-skip");
 	}
 </script>
@@ -100,6 +110,21 @@ const heroPhotoWallColumns = hero.photoWallColumns;
 	import { animate, splitText, stagger, waapi } from "animejs";
 
 	document.addEventListener("astro:page-load", async () => {
+		const heroIntroStorageKey = "camp2026:hero-intro-played";
+		const hasHeroIntroPlayed = () => {
+			try {
+				return window.localStorage.getItem(heroIntroStorageKey) === "1";
+			} catch {
+				return false;
+			}
+		};
+		const markHeroIntroPlayed = () => {
+			try {
+				window.localStorage.setItem(heroIntroStorageKey, "1");
+			} catch {
+				// If storage is unavailable, the intro remains a per-page-load experience.
+			}
+		};
 		const intro = document.querySelector<HTMLElement>("[data-hero-intro]");
 		const photoWallTracks = Array.from(document.querySelectorAll<HTMLElement>("[data-wall-track]"));
 		const heroSubtitle = document.querySelector<HTMLElement>("[data-hero-page-subtitle]");
@@ -111,11 +136,12 @@ const heroPhotoWallColumns = hero.photoWallColumns;
 		const topicViewport = intro?.querySelector<HTMLElement>(".hero-intro__topic-viewport");
 		const topicTrack = intro?.querySelector<HTMLElement>("[data-hero-intro-topic-track]");
 		const topics = intro ? Array.from(intro.querySelectorAll<HTMLElement>("[data-hero-intro-topic]")) : [];
-		const introPlayedBefore = sessionStorage.getItem("hero-intro-played") === "1";
+		const introPlayedBefore = hasHeroIntroPlayed();
 		const shouldSkipIntro = introPlayedBefore || window.scrollY > 0 || window.location.hash.length > 1;
 		const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 		let photoWallStarted = false;
 		let introFinished = false;
+		let introStarted = false;
 		let heroTitleRevealed = false;
 		let heroSubtitleRevealed = false;
 
@@ -347,6 +373,7 @@ const heroPhotoWallColumns = hero.photoWallColumns;
 			if (shouldSkipIntro) {
 				skipIntro();
 			} else {
+				introStarted = true;
 				document.documentElement.classList.add("hero-intro-lock");
 
 				try {
@@ -412,8 +439,9 @@ const heroPhotoWallColumns = hero.photoWallColumns;
 				}
 			}
 
-			// Mark intro as played for this session so it skips on back-navigation
-			sessionStorage.setItem("hero-intro-played", "1");
+			if (introStarted) {
+				markHeroIntroPlayed();
+			}
 		}
 	}); // end astro:page-load
 </script>
