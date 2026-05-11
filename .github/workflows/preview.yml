@@ -25,10 +25,10 @@ jobs:
           node-version: 22
 
       - name: Install
-        run: npm install
+        run: pnpm install
 
       - name: Build
-        run: npm run build
+        run: pnpm run build
 
       - name: Deploy to Cloudflare
         run: npx wrangler pages deploy dist \
