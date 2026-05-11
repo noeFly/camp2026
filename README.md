@@ -2,7 +2,7 @@
 
 SITCON Camp 2026 官方網站。專案使用 Astro 建置靜態頁面，搭配 Tailwind CSS、Lucide Icons，以及 GSAP / Anime.js 處理動態效果。
 
-正式站台設定在 `https://sitcon.camp/2026`，相關設定位於 [astro.config.mjs](astro.config.mjs)。 tttttttttttt
+正式站台設定在 `https://sitcon.camp/2026`，相關設定位於 [astro.config.mjs](astro.config.mjs)。 tttttttttttttt
 
 ## 環境需求
 
