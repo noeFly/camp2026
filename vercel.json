@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/2026/:path*",
+      "destination": "/:path*"
+    }
+  ]
+}
